@@ -2,7 +2,7 @@
 
 ## What is AIORTC?
 
-aiortc is a Python library that provides a WebRTC implementation built on top of asyncio, Python's standard asynchronous I/O framework.  For our purposesit can be used to create a WebRTC peer connection between a browser and a Python application for the purposes of streaming video and audio or sending/recieving data.
+aiortc is a Python library that provides a WebRTC implementation built on top of asyncio, Python's standard asynchronous I/O framework.  For our purposes it can be used to create a WebRTC peer connection between a browser and a Python application for the purposes of streaming video and audio or sending/recieving data.
 
 This document will sum up the process of installing and troubleshooting aiortc, and then provide a simple example of how to use it to stream video from a Python application to a browser on a peer to peer, local network basis.
 
@@ -12,7 +12,7 @@ Note: older distributions of Ubuntu may not have all the required dependencies. 
 
 1. Install dependencies:
 
-```apt install libavdevice-dev libavfilter-dev libopus-dev libvpx-dev pkg-config```
+```apt install libavdevice-dev libavfilte```
 
 2. Install aiortc:
 
@@ -20,11 +20,11 @@ Note: older distributions of Ubuntu may not have all the required dependencies. 
 
 ## Troubleshooting on Ubuntu Linux
 
-Older distributions of Ubuntu may not have all the required dependencies. In particular, the required FFmpeg version may not be installed, and there are problems with certain versions of the python cryptography library.
+Older distributions of Ubuntu may not have all the required dependencies. In particular, the required FFmpeg version may not be installed, there are problems with certain versions of the python cryptography library, and several python dependencies may be missing (cython, setup_tools for rust).  The following steps will help you troubleshooting these issues.
 
 ### FFmpeg
 
-The FFmpeg version required by aiortc is not available in the Ubuntu 18.04 repositories.  To install the required version, you can use the [Rob Savoury PPA](https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4).  To install the PPA and the required version of FFmpeg, run the following commands:
+note: The FFmpeg version required by aiortc is not available in the Ubuntu 18.04 repositories.  To install the required version you can use the [Rob Savoury PPA](https://launchpad.net/~savoury1/+archive/ubuntu/ffmpeg4) and apt.  Do not use `snap`.  To install the PPA and the required version of FFmpeg, run the following commands:
 
 ```
 sudo add-apt-repository ppa:savoury1/ffmpeg4
@@ -41,6 +41,10 @@ The cryptography library is required by aiortc, but there are problems with cert
 pip uninstall -y cryptography
 pip install cryptography==38.0.4
 ```
+
+### Python dependencies
+
+If pip requires cython or setup_tools for rust, install them with the following commands, go ahead and install those with `pip install <dependency>`.
 
 ## Example: Streaming video from a Python application to a browser
 
