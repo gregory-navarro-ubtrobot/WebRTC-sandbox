@@ -18,7 +18,7 @@ The following example will stream pre-recorded video from a linux device to a lo
 ffmpeg -re -i /home/user/video.mp4 -f mpegts udp://localhost:1234
 ```
 
-3. To verify that the video is streaming, open vlc player and select `Media->Open Network Stream...` and enter the following network address: `udp://localhost:1234`. The video should begin playing.S
+3. To verify that the video is streaming, open vlc player and select `Media->Open Network Stream...` and enter the following network address: `udp://localhost:1234`. The video should begin playing.
 
 ## Example: Streaming video from a linux device webcam 
 
