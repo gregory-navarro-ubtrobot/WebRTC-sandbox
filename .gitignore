@@ -1,2 +1,4 @@
 CMakeFiles/ 
 MYBUILD/myApp
+*/bin/*
+*/site-packages/*
