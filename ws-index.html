@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket + WebRTC Example</title>
+</head>
+<body>
+    <video id="remoteVideo" autoplay></video>
+
+    <script>
+        var ws = new WebSocket('ws://127.0.0.1:8765'); // Replace with your WebSocket server URL
+
+        ws.onopen = function() {
+            console.log('WebSocket connection established.');
+            ws.send('initiate-webrtc-session'); // Send a message to start WebRTC session
+        };
+
+        ws.onmessage = function(event) {
+            var message = JSON.parse(event.data);
+
+            if (message.type === 'webrtc-offer') {
+                handleWebRTCOffer(message.offer);
+            } else if (message.type === 'webrtc-answer') {
+                handleWebRTCAnswer(message.answer);
+            } else if (message.type === 'webrtc-candidate') {
+                handleWebRTCCandidate(message.candidate);
+            }
+        };
+
+        function handleWebRTCOffer(offer) {
+            // Create a new WebRTC peer connection
+            var pc = new RTCPeerConnection();
+
+            // Add remote ICE candidates
+            pc.onicecandidate = function(event) {
+                if (event.candidate) {
+                    ws.send(JSON.stringify({
+                        type: 'webrtc-candidate',
+                        candidate: event.candidate
+                    }));
+                }
+            };
+
+            // Set the remote description (offer)
+            pc.setRemoteDescription(new RTCSessionDescription(offer))
+                .then(function() {
+                    return pc.createAnswer();
+                })
+                .then(function(answer) {
+                    return pc.setLocalDescription(answer);
+                })
+                .then(function() {
+                    // Send the WebRTC answer to the WebSocket server
+                    ws.send(JSON.stringify({
+                        type: 'webrtc-answer',
+                        answer: pc.localDescription
+                    }));
+                })
+                .catch(function(error) {
+                    console.error('Error handling WebRTC offer:', error);
+                });
+
+            // Add the remote video stream to the video element
+            pc.ontrack = function(event) {
+                var remoteVideo = document.getElementById('remoteVideo');
+                remoteVideo.srcObject = event.streams[0];
+            };
+        }
+
+        function handleWebRTCAnswer(answer) {
+            // Set the remote description (answer)
+            pc.setRemoteDescription(new RTCSessionDescription(answer))
+                .catch(function(error) {
+                    console.error('Error handling WebRTC answer:', error);
+                });
+        }
+
+        function handleWebRTCCandidate(candidate) {
+            // Add the remote ICE candidate
+            pc.addIceCandidate(new RTCIceCandidate(candidate))
+                .catch(function(error) {
+                    console.error('Error handling WebRTC candidate:', error);
+                });
+        }
+    </script>
+</body>
+</html>
